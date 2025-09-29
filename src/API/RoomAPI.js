@@ -8,8 +8,6 @@ const api = axios.create({
 
 // Get Active Rooms
 export const getRooms = async () => {
-    // const res = await api.post("get_room_list_demo.php", AUTH);
-    // return res.data;
     try {
         const response = await fetch("https://xpresshotelpos.com/cloudpms/get_room_list_demo.php", {
             method: "POST",
@@ -35,13 +33,13 @@ export const getRooms = async () => {
 
 // Get Deleted Rooms
 export const getDeletedRooms = async () => {
-    const res = await api.post("get_room_list_deleted_demo.php", AUTH);
+    const res = await api.post("get_room_list_deleted_demo.php/action_flag = 3", AUTH);
     return res.data;
 };
 
 // Save Room (Add / Delete / Activate / Modify)
 export const saveRoom = async (roomData, actionFlag) => {
-    const res = await api.post("save_room_demo.php", {
+    const res = await api.post("save_room_demo.php/action_flag = 1", {
         ...AUTH,
         HotelId: 1,
         FromDevice: "Web",

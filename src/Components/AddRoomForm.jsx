@@ -12,7 +12,7 @@ const AddRoomForm = () => {
         DisplayIndex: 1,
         FromDevice: "Web",
         NetworkType: "WiFi",
-        ClientIp: "",
+        ClientIp: "203.0.113.45",
         CreatedBy: 101,
         EntryDate: new Date().toISOString().slice(0, 10),
     };

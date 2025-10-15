@@ -1,54 +1,70 @@
 import axios from "axios";
-import {API_BASE, AUTH} from "../Utils/config.js";
 
-const api = axios.create({
-    baseURL: API_BASE,
+const BASE = "https://xpresshotelpos.com/cloudpms";
+const API_USER = "pmsuser";
+const API_PASS = "pms@123";
+const HOTEL_ID = 1;
+
+const axiosInstance = axios.create({
+    baseURL: BASE,
     headers: { "Content-Type": "application/json" },
+    timeout: 15000,
 });
 
-// Get Active Rooms
-export const getRooms = async () => {
-    try {
-        const response = await fetch("https://xpresshotelpos.com/cloudpms/get_room_list_demo.php", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                ApiUser: "pmsuser",
-                ApiPass: "pms@123",
-                HotelId: 1,
-                FromDevice: "Mobile",
-                NetworkType: "WiFi",
-                ClientIp: "203.0.113.45",
-                CreatedBy: 101,
-            }),
-        });
+const authPayload = (extra = {}) => ({
+    ApiUser: API_USER,
+    ApiPass: API_PASS,
+    HotelId: HOTEL_ID,
+    ...extra,
+});
 
-        if (!response.ok) throw new Error("Network response was not ok");
-        return  await response.json();
-    } catch (error) {
-        console.error("Error fetching rooms:", error);
-        return [];
-    }
-};
-
-// Get Deleted Rooms
-export const getDeletedRooms = async () => {
-    const res = await api.post("get_room_list_deleted_demo.php/action_flag = 3", AUTH);
-    return res.data;
-};
-
-// Save Room (Add / Delete / Activate / Modify)
-export const saveRoom = async (roomData, actionFlag) => {
-    const res = await api.post("save_room_demo.php/action_flag = 1", {
-        ...AUTH,
-        HotelId: 1,
+export const getRoomList = async () => {
+    const { data } = await axiosInstance.post("/get_room_list_demo.php", authPayload({
         FromDevice: "Web",
         NetworkType: "WiFi",
-        ClientIp: "203.0.113.45",
+        ClientIp: "",
         CreatedBy: 101,
-        EntryDate: new Date().toISOString().split("T")[0],
-        ...roomData,
-        action_flag: actionFlag,
-    });
-    return res.data;
+    }));
+    return data?.result?.rooms || [];
+};
+
+export const getDeletedRoomList = async () => {
+    const { data } = await axiosInstance.post("/get_room_list_deleted_demo.php", authPayload({
+        FromDevice: "Web",
+        NetworkType: "WiFi",
+        ClientIp: "",
+        CreatedBy: 101,
+    }));
+    return data?.result?.deleted_rooms || [];
+};
+
+export const saveRoom = async (roomPayload) => {
+    const { data } = await axiosInstance.post("/save_room_demo.php", authPayload(roomPayload));
+    return data;
+};
+
+export const deleteRoom = async (room) => {
+    const { data } = await axiosInstance.post("/save_room_demo.php", authPayload({
+        ...room,
+        action_flag: 3,
+        FromDevice: "Web",
+        NetworkType: "WiFi",
+        ClientIp: "",
+        CreatedBy: 101,
+        EntryDate: new Date().toISOString().slice(0, 10),
+    }));
+    return data;
+};
+
+export const activateRoom = async (room) => {
+    const { data } = await axiosInstance.post("/save_room_demo.php", authPayload({
+        ...room,
+        action_flag: 4,
+        FromDevice: "Web",
+        NetworkType: "WiFi",
+        ClientIp: "",
+        CreatedBy: 101,
+        EntryDate: new Date().toISOString().slice(0, 10),
+    }));
+    return data;
 };

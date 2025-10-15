@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const BASE = "https://xpresshotelpos.com/cloudpms";
+const BASE = "/cloudpms";
 const API_USER = "pmsuser";
 const API_PASS = "pms@123";
 const HOTEL_ID = 1;

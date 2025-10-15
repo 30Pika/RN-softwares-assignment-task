@@ -5,5 +5,12 @@ export default defineConfig({
     plugins: [react()],
     server: {
         port: 5173,
+        proxy: {
+            "/cloudpms": {
+                target: "https://xpresshotelpos.com",
+                changeOrigin: true,
+                secure: false,
+            },
+        },
     },
 });
